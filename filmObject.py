@@ -1,8 +1,13 @@
+from dataclasses import dataclass
+from typing import Optional
+
+
+@dataclass
 class MediaObject:
-    def __init__(self, title, date, rating, synopsis, TMDBid, type):
-        self.title = title
-        self.date = date
-        self.rating = rating
-        self.synopsis = synopsis
-        self.TMDBid = TMDBid
-        self.type = type
+    title: str
+    date: str
+    rating: float
+    synopsis: str
+    TMDBid: int
+    type: str
+    tvdb_id: Optional[int] = None
