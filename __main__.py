@@ -11,7 +11,7 @@ from filmObject import MediaObject
 class introSubmitter:
 
     def __init__(self):
-        self.INTRO_submit = "https://api.theintrodb.org/v2/submit"
+        self.INTRO_submit = "https://api.theintrodb.org/v4/submit"
         self.INTRO_APIKEY = os.getenv("INTRO_APIKEY")
 
         self.TMDB_search = "https://api.themoviedb.org/3/search"
@@ -119,7 +119,10 @@ class introSubmitter:
             if mediaObject.type == "tv":
                 se = int(input("What season? "))
                 ep = int(input("What episode? "))
-                self.constructTIDBPostTV(mediaObject.TMDBid, mediaObject.type, se, ep, segment, startsecs, endsecs) # id, type, season, episode, segment, start, end
+                mapping = input("What episode mapping order? [default (default), official, dvd, alternate, absolute, regional] ") or None
+                if mapping == "default":
+                    mapping = None
+                self.constructTIDBPostTV(mediaObject.TMDBid, mediaObject.type, se, ep, segment, startsecs, endsecs, mapping) # id, type, season, episode, segment, start, end, mapping
             elif mediaObject.type == "movie":
                 self.constructTIDBPostFilm(mediaObject.TMDBid, mediaObject.type, segment, startsecs, endsecs) # id, type, segment, start, end
 
@@ -153,7 +156,7 @@ class introSubmitter:
             return True
         return None'''
 
-    def constructTIDBPostTV(self, id, type, season, episode, segment, start, end):
+    def constructTIDBPostTV(self, id, type, season, episode, segment, start, end, mapping=None):
         headers = {
             "accept": "application/json",
             "Authorization": f"Bearer {self.INTRO_APIKEY}"
@@ -177,6 +180,8 @@ class introSubmitter:
             "start_sec": start_val,
             "end_sec": end_val,
         }
+        if mapping:
+            data["mapping"] = mapping
 
         '''req = requests.Request('POST', self.INTRO_submit, headers=headers, json=data)
         prepared = req.prepare()
@@ -231,11 +236,14 @@ class introSubmitter:
         self.checkSubmission(response)
 
     def checkSubmission(self, response):
-        if response.status_code == 200 and response.json()['ok'] == True:
+        if response.status_code == 200 and response.json().get('ok') is True:
             submission_json = response.json()
             print("Submitted successfully")
-            print(f"id: {submission_json['submission'].subitem['id']}")
-            print(f"weight: {submission_json['submission'].subitem['weight']}")
+            for sub in submission_json.get('submissions', []):
+                print(f"id: {sub['id']}")
+                print(f"weight: {sub['weight']}")
+                if 'tvdbId' in sub and sub['tvdbId'] is not None:
+                    print(f"tvdbId: {sub['tvdbId']}")
         else:
             print(f"Submission failed with code {response.status_code}")
             print(response.text)
