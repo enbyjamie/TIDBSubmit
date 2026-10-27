@@ -1,6 +1,10 @@
+import os
 import requests
 import json
+from dotenv import load_dotenv
 
+
+load_dotenv()
 
 from filmObject import MediaObject
 
@@ -8,10 +12,10 @@ class introSubmitter:
 
     def __init__(self):
         self.INTRO_submit = "https://api.theintrodb.org/v2/submit"
-        self.INTRO_APIKEY = "theintrodb:user_38CzWBmNwv1qjIdWh4nC8JobYKx:JuzkeeenuKZ9mxbRDLCT3er1qyh-Vf5VUFWzPSjjzvw"
+        self.INTRO_APIKEY = os.getenv("INTRO_APIKEY")
 
         self.TMDB_search = "https://api.themoviedb.org/3/search"
-        self.TMDB_APIKEY = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI3NmU4ZTg0NjcxNTZmZjcyNjliMDI5OWU4MGFlMjllNyIsIm5iZiI6MTcxNzE2ODUwNS45MTIsInN1YiI6IjY2NTllOTc5Yzk0MGNmYzVjZDc1MjE2NSIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.bxd2yxI0nIo9lQKvA4kW9fEAhR7tpsaMPWhRTlch4Vk"
+        self.TMDB_APIKEY = os.getenv("TMDB_APIKEY")
 
     def searchForFilm(self, x):
         print("Searching for: " + x)
